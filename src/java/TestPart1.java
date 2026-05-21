@@ -2,62 +2,88 @@ import java.time.LocalDate;
 
 public class TestPart1 {
     public static void main(String[] args) {
-        TransitHub mainHub = new TransitHub("Riyadh Metro Hub", "Riyadh");
-        TransitHub southHub = new TransitHub("Abha Transit Hub", "Abha");
 
-        Bus electricBus = new Bus("BUS-301", 3, 75, 4.5, true);
-        Bus dieselBus = new Bus("BUS-402", 45, 90, 3.0, false);
-        Train cityTrain = new Train("TRN-500", 250, 600, 6);
+        // --- Setup Hubs ---
+        TransitHub northHub = new TransitHub("North Jeddah Hub", "Jeddah");
+        TransitHub coastHub = new TransitHub("Corniche Hub", "Jeddah");
 
-        mainHub.addVehicle(electricBus);
-        mainHub.addVehicle(cityTrain);
-        southHub.addVehicle(dieselBus);
+        // --- Setup Vehicles ---
+        Bus electricBus = new Bus("BUS-771", 3, 60, 3.5, true);
+        Train expressTrain = new Train("TRN-220", 300, 800, 4);
+        Bus dieselBus = new Bus("BUS-992", 50, 100, 2.0, false);
 
-        mainHub.addRoute(new Route("King Fahd Road", 20));
-        mainHub.addRoute(new Route("Diplomatic Quarter", 14));
-        mainHub.addRoute(new Route("King Khalid Airport", 40));
+        coastHub.addVehicle(electricBus);
+        coastHub.addVehicle(expressTrain);
+        northHub.addVehicle(dieselBus);
 
-        southHub.addRoute(new Route("Al Soudah Park", 6));
-        southHub.addRoute(new Route("Abha Mall", 3));
+        // --- Setup Routes ---
+        coastHub.addRoute(new Route("Jeddah Islamic Port", 10));
+        coastHub.addRoute(new Route("Red Sea Mall", 8));
 
-        Passenger ahmed = new Passenger("Ahmed", 180);
-        ahmed.addTransitPass(new TransitPass("TP-011", 30, LocalDate.now().plusMonths(3)));
-        ahmed.addCreditCard(new CreditCard(600, "9876543298765432", "10/29", 741, "Ahmed Al-Qahtani"));
+        northHub.addRoute(new Route("King Abdulaziz University", 12));
+        northHub.addRoute(new Route("Obhur Beach", 22));
+        northHub.addRoute(new Route("KAEC", 60));
 
-        Passenger maha = new Passenger("Maha", 100);
-        maha.addTransitPass(new TransitPass("TP-022", 40, LocalDate.now().plusMonths(2)));
-        maha.addCreditCard(new CreditCard(200, "1111222233334444", "06/27", 852, "Maha Al-Zahrani"));
+        // --- Setup Passengers ---
+        Passenger khalid = new Passenger("Khalid", 200);
+        khalid.addCreditCard(new CreditCard(1000, "4444333322221111", "03/30", 321, "Khalid Al-Ghamdi"));
+        khalid.addTransitPass(new TransitPass("TP-101", 10, LocalDate.now().plusMonths(6)));
 
-        Passenger tariq = new Passenger("Tariq", 60);
-        tariq.addTransitPass(new TransitPass("TP-033", 55, LocalDate.now().plusMonths(1)));
+        Passenger nora = new Passenger("Nora", 50);
+        nora.addTransitPass(new TransitPass("TP-202", 80, LocalDate.now().plusMonths(4)));
+        nora.addCreditCard(new CreditCard(300, "7777888899990000", "11/26", 654, "Nora Al-Otaibi"));
 
-        System.out.println("===== TransitHub Part 1 Demo =====");
-        System.out.println("All hub names: " + mainHub.getHubNames());
-        System.out.println("Main hub average route distance: "
-                + String.format("%.2f", mainHub.getAverageRouteDistance()) + " km");
-        System.out.println("South hub average route distance: "
-                + String.format("%.2f", southHub.getAverageRouteDistance()) + " km");
+        Passenger faisal = new Passenger("Faisal", 120);
+        faisal.addTransitPass(new TransitPass("TP-303", 5, LocalDate.now().plusMonths(2)));
+        faisal.addCreditCard(new CreditCard(150, "1212343456567878", "07/28", 789, "Faisal Al-Dosari"));
 
-        System.out.println("\n===== Vehicles =====");
-        System.out.println(electricBus);
-        System.out.println(cityTrain);
+        // --- Hub Info ---
+        System.out.println("===== Hub Overview =====");
+        System.out.println("Registered hubs: " + northHub.getHubNames());
+        System.out.println("Corniche Hub avg route distance: "
+                + String.format("%.2f", coastHub.getAverageRouteDistance()) + " km");
+        System.out.println("North Hub avg route distance: "
+                + String.format("%.2f", northHub.getAverageRouteDistance()) + " km");
+
+        // --- Vehicle Info ---
+        System.out.println("\n===== Fleet Details =====");
         System.out.println(dieselBus);
+        System.out.println(electricBus);
+        System.out.println(expressTrain);
 
-        System.out.println("\n===== Payment and Boarding =====");
-        ahmed.topUpTransitPass(1, 1, 200);
-        ahmed.board(electricBus, 1, 15);
-        maha.board(electricBus, 1, 12);
-        tariq.board(electricBus, 1, 10);
+        // --- Top-up before boarding (Khalid's balance is low) ---
+        System.out.println("\n===== Top-Up =====");
+        khalid.topUpTransitPass(1, 1, 100);
+        faisal.topUpTransitPass(1, 1, 50);
 
-        System.out.println("\n===== Train Trip and Reward Points =====");
-        ahmed.board(cityTrain, 1, 100);
-        ahmed.redeemPointsToPass(1, 50);
+        // --- Boarding ---
+        System.out.println("\n===== Boarding =====");
+        nora.board(electricBus, 1, 8);
+        khalid.board(electricBus, 1, 8);
+        faisal.board(electricBus, 1, 8);      // bus is now full (capacity 3)
+        nora.board(electricBus, 1, 5);        // should fail: bus full
 
-        System.out.println("\n===== Final Passenger Details =====");
-        System.out.println(ahmed);
-        System.out.println(ahmed.getTransitPasses().get(0));
-        System.out.println(ahmed.getCreditCards().get(0));
-        System.out.println(maha);
-        System.out.println(tariq);
+        // --- Long train trip to earn points ---
+        System.out.println("\n===== Train Journey =====");
+        nora.board(expressTrain, 1, 60);
+        khalid.board(expressTrain, 1, 60);
+
+        // --- Redeem points ---
+        System.out.println("\n===== Redeem Points =====");
+        nora.redeemPointsToPass(1, 50);
+        khalid.redeemPointsToPass(1, 50);
+        faisal.redeemPointsToPass(1, 50);     // should fail: not enough points
+
+        // --- Final State ---
+        System.out.println("\n===== Final Passenger Summary =====");
+        System.out.println(khalid);
+        System.out.println(khalid.getTransitPasses().get(0));
+        System.out.println(khalid.getCreditCards().get(0));
+        System.out.println();
+        System.out.println(nora);
+        System.out.println(nora.getTransitPasses().get(0));
+        System.out.println();
+        System.out.println(faisal);
+        System.out.println(faisal.getTransitPasses().get(0));
     }
 }
